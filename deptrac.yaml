@@ -1,0 +1,121 @@
+deptrac:
+  paths:
+    - ./app
+
+  layers:
+    - name: DomainActions
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Actions\\.*
+    - name: DomainManagers
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Managers\\.*
+    - name: DomainServices
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Services\\.*
+    - name: DomainValidators
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Validators\\.*
+    - name: DomainContracts
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Contracts\\.*
+    - name: DomainEvents
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Events\\.*
+    - name: DomainListeners
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Listeners\\.*
+    - name: DomainModels
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Models\\.*
+    - name: DomainPolicies
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Policies\\.*
+    - name: DomainData
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Data\\.*
+    - name: DomainEnums
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Enums\\.*
+    - name: Integrations
+      collectors:
+        - type: classLike
+          value: ^App\\Integrations\\.*
+
+  ruleset:
+    UI:
+      - DomainActions
+      - DomainServices
+      - DomainModels
+      - DomainData
+      - DomainEnums
+      - DomainContracts
+      - DomainManagers
+    DomainActions:
+      - DomainServices
+      - DomainValidators
+      - DomainModels
+      - DomainData
+      - DomainEnums
+      - DomainContracts
+      - DomainEvents
+      - DomainManagers
+    DomainManagers:
+      - DomainContracts
+      - DomainEnums
+      - Integrations
+    DomainServices:
+      - DomainModels
+      - DomainValidators
+      - DomainData
+      - DomainEnums
+      - DomainContracts
+      - DomainEvents
+    DomainValidators:
+      - DomainModels
+      - DomainData
+      - DomainEnums
+    DomainListeners:
+      - DomainActions
+      - DomainServices
+      - DomainModels
+      - DomainData
+      - DomainEnums
+      - DomainEvents
+    DomainEvents:
+      - DomainModels
+      - DomainData
+      - DomainEnums
+    DomainPolicies:
+      - DomainModels
+      - DomainEnums
+    DomainModels:
+      - DomainEnums
+      - DomainData
+    DomainData:
+      - DomainEnums
+      - DomainModels
+    DomainContracts:
+      - DomainData
+      - DomainEnums
+      - DomainModels
+    DomainEnums: []
+    Integrations:
+      - DomainContracts
+      - DomainData
+      - DomainEnums
+    Providers:
+      - DomainModels
+      - DomainPolicies
+      - DomainContracts
+      - Integrations
