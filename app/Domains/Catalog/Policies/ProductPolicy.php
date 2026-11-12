@@ -17,7 +17,14 @@ final class ProductPolicy
 
     public function view(User $user, Product $product): bool
     {
-        return $user->isStaff() || $product->status->is_available || $product->status->is_archived;
+        if ($user->isStaff()) {
+            return true;
+        }
+
+        $product->loadMissing('status');
+        $status = $product->status;
+
+        return $status !== null && ($status->is_available || $status->is_archived);
     }
 
     public function create(User $user): bool
