@@ -16,9 +16,9 @@ final class BrandPolicy
         return $user->isStaff();
     }
 
-    public function view(User $user, Brand $brand): bool
+    public function view(?User $user, Brand $brand): bool
     {
-        return $user->isStaff() || $brand->is_active;
+        return $user?->isStaff() === true || $brand->is_active;
     }
 
     public function create(User $user): bool

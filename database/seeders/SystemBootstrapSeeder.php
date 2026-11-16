@@ -20,18 +20,19 @@ final class SystemBootstrapSeeder extends Seeder
         foreach (SystemRole::cases() as $role) {
             Role::findOrCreate($role->value, 'web');
         }
+        if (! app()->isProduction()) {
+            $admin = User::query()->firstOrCreate(
+                ['email' => 'admin@shades-archive.test'],
+                [
+                    'name' => 'Shades Archive Admin',
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ],
+            );
 
-        $admin = User::query()->firstOrCreate(
-            ['email' => 'admin@shades-archive.test'],
-            [
-                'name' => 'Shades Archive Admin',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ],
-        );
-
-        if (! $admin->hasRole(SystemRole::SuperAdmin->value)) {
-            $admin->assignRole(SystemRole::SuperAdmin->value);
+            if (! $admin->hasRole(SystemRole::SuperAdmin->value)) {
+                $admin->assignRole(SystemRole::SuperAdmin->value);
+            }
         }
 
         if (! StoreSetting::query()->exists()) {

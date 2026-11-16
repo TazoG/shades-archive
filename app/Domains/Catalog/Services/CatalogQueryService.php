@@ -25,7 +25,6 @@ final readonly class CatalogQueryService
                 'lensColor',
                 'conditionGrade',
                 'primaryImage',
-                'images',
             ])
             ->whereHas('status', static function (Builder $statusQuery) use ($filter): void {
                 if ($filter->archiveOnly) {

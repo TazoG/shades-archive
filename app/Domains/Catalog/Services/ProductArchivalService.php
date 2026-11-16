@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domains\Catalog\Services;
 
 use App\Domains\Catalog\Exceptions\MissingArchiveStatusException;
+use App\Domains\Catalog\Exceptions\MissingReservedStatusException;
 use App\Domains\Catalog\Models\Product;
 use App\Domains\Catalog\Models\ProductStatus;
 
@@ -40,9 +41,11 @@ final readonly class ProductArchivalService
             ->orderBy('sort_order')
             ->first();
 
-        if ($reservedStatus !== null) {
-            $product->product_status_id = $reservedStatus->id;
+        if ($reservedStatus === null) {
+            throw MissingReservedStatusException::create();
         }
+
+        $product->product_status_id = $reservedStatus->id;
     }
 
     public function restoreAvailableStatus(Product $product): void

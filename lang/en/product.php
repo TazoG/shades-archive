@@ -3,12 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'types' => [
-        'sunglasses' => 'Sunglasses',
-        'watch' => 'Watch',
-        'backpack' => 'Backpack',
-        'accessory' => 'Accessory',
-    ],
     'sections' => [
         'general' => 'General Information',
         'specs' => 'Technical Specifications & Provenance',
@@ -23,7 +17,6 @@ return [
         'frame_color' => 'Frame Color',
         'lens_color' => 'Lens Color',
         'condition_grade' => 'Condition Grade',
-        'product_type' => 'Product Type',
         'sku' => 'SKU',
         'slug' => 'URL Slug',
         'model_code' => 'Factory Model Code',
@@ -36,6 +29,8 @@ return [
         'price_gel' => 'Price (GEL ₾)',
         'price_usd' => 'Price (USD $ — Optional)',
         'compare_at_price_gel' => 'Compare-at Price (GEL ₾)',
+        'compare_at_price_usd' => 'Compare-at Price (USD $)',
+        'is_reserved' => 'Reserved Status',
         'stock_quantity' => 'Stock Quantity',
         'is_one_of_one' => '1-of-1 Archive Piece',
         'is_featured' => 'Featured',

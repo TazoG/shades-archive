@@ -3,12 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'types' => [
-        'sunglasses' => 'სათვალე',
-        'watch' => 'საათი',
-        'backpack' => 'ზურგჩანთა',
-        'accessory' => 'აქსესუარი',
-    ],
     'sections' => [
         'general' => 'ძირითადი ინფორმაცია',
         'specs' => 'ტექნიკური მახასიათებლები და არქივი',
@@ -23,7 +17,6 @@ return [
         'frame_color' => 'ჩარჩოს ფერი',
         'lens_color' => 'ლინზის ფერი',
         'condition_grade' => 'მდგომარეობა (Condition)',
-        'product_type' => 'პროდუქტის ტიპი',
         'sku' => 'SKU კოდი',
         'slug' => 'URL Slug',
         'model_code' => 'მოდელის კოდი',
@@ -36,6 +29,8 @@ return [
         'price_gel' => 'ფასი (GEL ₾)',
         'price_usd' => 'ფასი (USD $ — არასავალდებულო)',
         'compare_at_price_gel' => 'ძველი ფასი (GEL ₾)',
+        'compare_at_price_usd' => 'ძველი ფასი (USD $)',
+        'is_reserved' => 'დარეზერვებული სტატუსი',
         'stock_quantity' => 'მარაგი',
         'is_one_of_one' => '1-of-1 უნიკალური ეგზემპლარი',
         'is_featured' => 'რჩეული (Featured)',

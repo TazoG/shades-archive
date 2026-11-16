@@ -12,6 +12,9 @@ return [
         'reservation' => 'Reservation',
     ],
     'exceptions' => [
+        'missing_reserved_status' => 'No reservation status (is_reserved) is configured in the system.',
+        'invalid_movement_sign' => 'Stock adjustment sign does not match the movement type.',
+        'not_reserved_for_confirmation' => 'Product is not in a reserved state to confirm sale.',
         'insufficient_stock' => 'Product ":product" is no longer available in the requested quantity.',
         'zero_delta' => 'Stock adjustment delta cannot be zero.',
         'one_of_one_limit' => 'A 1-of-1 archive piece cannot have stock greater than 1.',

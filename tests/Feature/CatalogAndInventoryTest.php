@@ -2,20 +2,22 @@
 
 declare(strict_types=1);
 
-use App\Domains\Catalog\Actions\ArchiveProductAction;
 use App\Domains\Catalog\Data\CatalogFilterData;
 use App\Domains\Catalog\Events\ProductArchived;
 use App\Domains\Catalog\Exceptions\MissingArchiveStatusException;
 use App\Domains\Catalog\Models\Brand;
 use App\Domains\Catalog\Models\Category;
 use App\Domains\Catalog\Models\Product;
+use App\Domains\Catalog\Models\ProductImage;
 use App\Domains\Catalog\Models\ProductStatus;
 use App\Domains\Catalog\Services\CatalogQueryService;
 use App\Domains\Catalog\Services\ProductStatusProtectionService;
 use App\Domains\Inventory\Actions\AdjustStockAction;
+use App\Domains\Inventory\Actions\ArchiveProductAction;
 use App\Domains\Inventory\Data\StockAdjustmentData;
 use App\Domains\Inventory\Enums\StockMovementType;
 use App\Domains\Inventory\Models\StockMovement;
+use App\Domains\Inventory\Services\InventoryService;
 use App\Domains\Settings\Services\CurrencyConversionService;
 use Database\Seeders\SystemBootstrapSeeder;
 use Illuminate\Support\Facades\Event;
@@ -195,4 +197,76 @@ it('converts decimal prices to minor units without float drift', function (): vo
 
     expect($converter->toMinorUnits('199.99'))->toBe(19999)
         ->and($converter->toMinorUnits('0.01'))->toBe(1);
+});
+
+it('confirms a reserved product as a sale and logs order reference in stock movements', function (): void {
+    Event::fake([ProductArchived::class]);
+
+    $product = createSampleProduct();
+    $inventoryService = app(InventoryService::class);
+
+    $inventoryService->adjustStock(new StockAdjustmentData(
+        productId: $product->id,
+        quantityDelta: -1,
+        movementType: StockMovementType::Reservation,
+        reason: 'Flitt checkout started',
+    ));
+
+    $archived = $inventoryService->confirmReservationSale(
+        productId: $product->id,
+        referenceType: 'order',
+        referenceId: 42,
+        reason: 'Flitt payment succeeded',
+    );
+
+    $saleMovement = StockMovement::query()
+        ->where('product_id', $product->id)
+        ->where('movement_type', StockMovementType::Sale)
+        ->first();
+
+    expect($archived->stock_quantity)->toBe(0)
+        ->and($archived->status?->is_archived)->toBeTrue()
+        ->and($saleMovement)->not->toBeNull()
+        ->and($saleMovement?->quantity_delta)->toBe(0)
+        ->and($saleMovement?->reference_type)->toBe('order')
+        ->and($saleMovement?->reference_id)->toBe(42);
+
+    Event::assertDispatched(ProductArchived::class);
+});
+
+it('rejects mismatched stock movement delta signs and malformed currency strings', function (): void {
+    $product = createSampleProduct();
+    $adjustStock = app(AdjustStockAction::class);
+    $converter = app(CurrencyConversionService::class);
+
+    expect(fn (): Product => $adjustStock->execute(new StockAdjustmentData(
+        productId: $product->id,
+        quantityDelta: 1,
+        movementType: StockMovementType::Sale,
+    )))->toThrow(ValidationException::class);
+
+    expect(fn (): int => $converter->toMinorUnits('1,850.00'))
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('resolves primaryImage prioritizing is_primary over sort_order', function (): void {
+    $product = createSampleProduct();
+
+    ProductImage::query()->create([
+        'product_id' => $product->id,
+        'path' => 'products/side-view.jpg',
+        'is_primary' => false,
+        'sort_order' => 1,
+    ]);
+
+    $primary = ProductImage::query()->create([
+        'product_id' => $product->id,
+        'path' => 'products/front-studio.jpg',
+        'is_primary' => true,
+        'sort_order' => 5,
+    ]);
+
+    $loaded = Product::query()->with('primaryImage')->findOrFail($product->id);
+
+    expect($loaded->primaryImage?->id)->toBe($primary->id);
 });

@@ -21,3 +21,11 @@ arch('no inline HTML helpers in PHP classes')
 arch('domains do not depend on UI or external integrations')
     ->expect('App\Domains')
     ->not->toUse(['App\Filament', 'App\Livewire', 'App\Http']);
+
+arch('domains do not depend on UI or external integrations')
+    ->expect('App\Domains')
+    ->not->toUse(['App\Filament', 'App\Livewire', 'App\Http', 'App\Integrations']);
+
+arch('catalog domain does not depend on inventory domain')
+    ->expect('App\Domains\Catalog')
+    ->not->toUse('App\Domains\Inventory');

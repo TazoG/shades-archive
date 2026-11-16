@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\Catalog\Actions;
+namespace App\Domains\Inventory\Actions;
 
 use App\Domains\Catalog\Events\ProductArchived;
 use App\Domains\Catalog\Models\Product;

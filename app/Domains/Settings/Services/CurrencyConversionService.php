@@ -30,7 +30,13 @@ final readonly class CurrencyConversionService
 
     public function toMinorUnits(string $decimalAmount): int
     {
-        $normalized = number_format((float) $decimalAmount, 2, '.', '');
+        $trimmed = trim($decimalAmount);
+
+        if (preg_match('/^-?\d+(?:\.\d{1,2})?$/', $trimmed) !== 1) {
+            throw new \InvalidArgumentException("Invalid decimal monetary amount: [{$decimalAmount}]");
+        }
+
+        $normalized = number_format((float) $trimmed, 2, '.', '');
         [$whole, $fraction] = explode('.', $normalized);
 
         $sign = str_starts_with($whole, '-') ? -1 : 1;

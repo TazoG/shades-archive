@@ -25,11 +25,7 @@ final readonly class InventoryService
 
     public function adjustStock(StockAdjustmentData $data, ?User $actor = null): Product
     {
-        if ($data->quantityDelta === 0) {
-            throw ValidationException::withMessages([
-                'quantity_delta' => [__('inventory.exceptions.zero_delta')],
-            ]);
-        }
+        $this->assertValidDeltaSign($data);
 
         $wasArchivedNow = false;
 
@@ -87,5 +83,71 @@ final readonly class InventoryService
         }
 
         return $updatedProduct;
+    }
+
+    public function confirmReservationSale(
+        int $productId,
+        ?string $referenceType = null,
+        ?int $referenceId = null,
+        ?User $actor = null,
+        ?string $reason = null,
+    ): Product {
+        $wasArchivedNow = false;
+
+        $archivedProduct = Product::query()->getConnection()->transaction(
+            function () use ($productId, $referenceType, $referenceId, $actor, $reason, &$wasArchivedNow): Product {
+                $product = Product::query()
+                    ->with('status')
+                    ->lockForUpdate()
+                    ->findOrFail($productId);
+
+                if ($product->status?->is_reserved !== true || $product->stock_quantity !== 0) {
+                    throw ValidationException::withMessages([
+                        'product_id' => [__('inventory.exceptions.not_reserved_for_confirmation')],
+                    ]);
+                }
+
+                $wasArchivedNow = $this->archivalService->applyArchiveStatus($product);
+                $product->save();
+
+                StockMovement::query()->create([
+                    'product_id' => $product->id,
+                    'user_id' => $actor?->id,
+                    'reference_type' => $referenceType,
+                    'reference_id' => $referenceId,
+                    'movement_type' => StockMovementType::Sale,
+                    'quantity_delta' => 0,
+                    'stock_after' => 0,
+                    'reason' => $reason ?? 'Reservation confirmed as sale',
+                ]);
+
+                return $product->refresh();
+            },
+            attempts: 3,
+        );
+
+        if ($wasArchivedNow) {
+            $this->events->dispatch(new ProductArchived($archivedProduct));
+        }
+
+        return $archivedProduct;
+    }
+
+    private function assertValidDeltaSign(StockAdjustmentData $data): void
+    {
+        if ($data->quantityDelta === 0) {
+            throw ValidationException::withMessages([
+                'quantity_delta' => [__('inventory.exceptions.zero_delta')],
+            ]);
+        }
+
+        $isSaleOrReservation = in_array($data->movementType, [StockMovementType::Sale, StockMovementType::Reservation], true);
+        $isReturnOrInitial = in_array($data->movementType, [StockMovementType::Return, StockMovementType::Initial], true);
+
+        if (($isSaleOrReservation && $data->quantityDelta > 0) || ($isReturnOrInitial && $data->quantityDelta < 0)) {
+            throw ValidationException::withMessages([
+                'quantity_delta' => [__('inventory.exceptions.invalid_movement_sign')],
+            ]);
+        }
     }
 }
