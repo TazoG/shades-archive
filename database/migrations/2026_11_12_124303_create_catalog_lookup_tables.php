@@ -22,7 +22,7 @@ return new class extends Migration
 
         Schema::create('categories', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->restrictOnDelete();
             $table->string('slug')->unique();
             $table->json('name');
             $table->json('description')->nullable();
@@ -37,6 +37,7 @@ return new class extends Migration
             $table->json('name');
             $table->unsignedSmallInteger('start_year')->nullable();
             $table->unsignedSmallInteger('end_year')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });
@@ -46,6 +47,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->json('name');
             $table->string('hex_code', 7)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 
@@ -54,6 +56,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->json('name');
             $table->string('hex_code', 7)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 
@@ -63,6 +66,7 @@ return new class extends Migration
             $table->json('name');
             $table->json('description')->nullable();
             $table->unsignedTinyInteger('score_out_of_ten')->default(10);
+            $table->boolean('is_active')->default(true);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });
@@ -74,6 +78,7 @@ return new class extends Migration
             $table->string('color', 32)->default('#18181b');
             $table->boolean('is_default')->default(false);
             $table->boolean('is_available')->default(true);
+            $table->boolean('is_reserved')->default(false);
             $table->boolean('is_archived')->default(false);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();

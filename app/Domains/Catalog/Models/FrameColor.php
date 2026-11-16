@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property string $name
+ */
 final class FrameColor extends Model
 {
     use HasTranslations;
@@ -16,7 +19,7 @@ final class FrameColor extends Model
     public array $translatable = ['name'];
 
     /** @var list<string> */
-    protected $fillable = ['slug', 'name', 'hex_code'];
+    protected $fillable = ['slug', 'name', 'hex_code', 'is_active'];
 
     /**
      * @return HasMany<Product, $this>

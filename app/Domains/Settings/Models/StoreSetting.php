@@ -28,7 +28,7 @@ final class StoreSetting extends Model
     {
         return [
             'default_currency' => CurrencyCode::class,
-            'usd_exchange_rate' => 'float',
+            'usd_exchange_rate' => 'decimal:4',
             'worldwide_shipping_enabled' => 'boolean',
         ];
     }

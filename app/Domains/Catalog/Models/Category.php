@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property string $name
+ * @property string|null $description
+ */
 final class Category extends Model
 {
     use HasTranslations;

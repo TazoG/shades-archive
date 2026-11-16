@@ -15,12 +15,11 @@ return new class extends Migration
             $table->foreignId('brand_id')->constrained('brands')->restrictOnDelete();
             $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
             $table->foreignId('product_status_id')->constrained('product_statuses')->restrictOnDelete();
-            $table->foreignId('era_id')->nullable()->constrained('eras')->nullOnDelete();
-            $table->foreignId('frame_color_id')->nullable()->constrained('frame_colors')->nullOnDelete();
-            $table->foreignId('lens_color_id')->nullable()->constrained('lens_colors')->nullOnDelete();
-            $table->foreignId('condition_grade_id')->nullable()->constrained('condition_grades')->nullOnDelete();
+            $table->foreignId('era_id')->nullable()->constrained('eras')->restrictOnDelete();
+            $table->foreignId('frame_color_id')->nullable()->constrained('frame_colors')->restrictOnDelete();
+            $table->foreignId('lens_color_id')->nullable()->constrained('lens_colors')->restrictOnDelete();
+            $table->foreignId('condition_grade_id')->nullable()->constrained('condition_grades')->restrictOnDelete();
 
-            $table->string('product_type', 32)->index();
             $table->string('sku')->unique();
             $table->string('slug')->unique();
             $table->string('model_code')->nullable();
@@ -35,12 +34,19 @@ return new class extends Migration
             $table->decimal('price_gel', 12, 2);
             $table->decimal('price_usd', 12, 2)->nullable();
             $table->decimal('compare_at_price_gel', 12, 2)->nullable();
+            $table->decimal('compare_at_price_usd', 12, 2)->nullable();
 
             $table->unsignedInteger('stock_quantity')->default(1);
             $table->boolean('is_one_of_one')->default(true);
             $table->boolean('is_featured')->default(false);
             $table->timestamp('archived_at')->nullable()->index();
             $table->timestamps();
+
+            $table->index(['product_status_id', 'created_at']);
+            $table->index(['product_status_id', 'price_gel']);
+            $table->index(['product_status_id', 'is_featured', 'created_at']);
+            $table->index(['brand_id', 'product_status_id']);
+            $table->index(['category_id', 'product_status_id']);
         });
 
         Schema::create('product_images', function (Blueprint $table): void {
@@ -51,17 +57,22 @@ return new class extends Migration
             $table->boolean('is_primary')->default(false);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
+
+            $table->index(['product_id', 'is_primary', 'sort_order']);
         });
 
         Schema::create('stock_movements', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->restrictOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('movement_type', 32);
+            $table->nullableMorphs('reference');
+            $table->string('movement_type', 32)->index();
             $table->integer('quantity_delta');
             $table->unsignedInteger('stock_after');
             $table->string('reason')->nullable();
             $table->timestamps();
+
+            $table->index(['product_id', 'created_at']);
         });
     }
 

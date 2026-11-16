@@ -15,13 +15,12 @@ final class ProductPolicy
         return $user->isStaff();
     }
 
-    public function view(User $user, Product $product): bool
+    public function view(?User $user, Product $product): bool
     {
-        if ($user->isStaff()) {
+        if ($user?->isStaff() === true) {
             return true;
         }
 
-        $product->loadMissing('status');
         $status = $product->status;
 
         return $status !== null && ($status->is_available || $status->is_archived);

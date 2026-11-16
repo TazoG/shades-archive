@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property string $name
+ */
 final class Era extends Model
 {
     use HasTranslations;
@@ -16,7 +19,7 @@ final class Era extends Model
     public array $translatable = ['name'];
 
     /** @var list<string> */
-    protected $fillable = ['slug', 'name', 'start_year', 'end_year', 'sort_order'];
+    protected $fillable = ['slug', 'name', 'start_year', 'end_year', 'sort_order', 'is_active'];
 
     /**
      * @return HasMany<Product, $this>
@@ -35,6 +38,7 @@ final class Era extends Model
             'start_year' => 'integer',
             'end_year' => 'integer',
             'sort_order' => 'integer',
+            'is_active' => 'boolean',
         ];
     }
 }

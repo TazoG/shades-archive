@@ -33,6 +33,6 @@ final class BrandPolicy
 
     public function delete(User $user, Brand $brand): bool
     {
-        return $user->hasSystemRole(SystemRole::SuperAdmin) && ! $brand->products()->exists();
+        return $user->hasSystemRole(SystemRole::SuperAdmin);
     }
 }

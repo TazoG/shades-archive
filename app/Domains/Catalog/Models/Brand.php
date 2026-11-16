@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property string $name
+ * @property string|null $description
+ */
 final class Brand extends Model
 {
     use HasTranslations;

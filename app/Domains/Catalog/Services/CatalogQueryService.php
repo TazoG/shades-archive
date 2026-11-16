@@ -24,6 +24,7 @@ final readonly class CatalogQueryService
                 'frameColor',
                 'lensColor',
                 'conditionGrade',
+                'primaryImage',
                 'images',
             ])
             ->whereHas('status', static function (Builder $statusQuery) use ($filter): void {
@@ -34,14 +35,22 @@ final readonly class CatalogQueryService
                 }
             });
 
+        if (! $filter->archiveOnly) {
+            $query->where('stock_quantity', '>', 0);
+        }
+
         if ($filter->search !== null && $filter->search !== '') {
-            $term = '%'.$filter->search.'%';
-            $query->where(static function (Builder $searchQuery) use ($term): void {
+            $escaped = addcslashes($filter->search, '%_\\');
+            $term = '%'.$escaped.'%';
+
+            $query->where(static function (Builder $searchQuery) use ($term, $escaped): void {
                 $searchQuery
                     ->where('sku', 'like', $term)
                     ->orWhere('model_code', 'like', $term)
                     ->orWhere('serial_number', 'like', $term)
-                    ->orWhere('name', 'like', $term);
+                    ->orWhere(static function (Builder $translationQuery) use ($escaped): void {
+                        $translationQuery->whereTranslationLike(['name', 'subtitle'], $escaped, ['ka', 'en']);
+                    });
             });
         }
 
@@ -50,7 +59,11 @@ final readonly class CatalogQueryService
         }
 
         if ($filter->categorySlug !== null && $filter->categorySlug !== '') {
-            $query->whereHas('category', static fn (Builder $q): Builder => $q->where('slug', $filter->categorySlug));
+            $slug = $filter->categorySlug;
+            $query->whereHas('category', static function (Builder $q) use ($slug): void {
+                $q->where('slug', $slug)
+                    ->orWhereHas('parent', static fn (Builder $parentQuery): Builder => $parentQuery->where('slug', $slug));
+            });
         }
 
         if ($filter->eraSlug !== null && $filter->eraSlug !== '') {

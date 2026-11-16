@@ -6,8 +6,11 @@ parameters:
     paths:
         - app/
         - database/
+        - tests/
     excludePaths:
         - database/migrations/*_create_permission_tables.php
     level: 10
     parseModelCastsMethod: true
+    checkModelProperties: true
+    checkDispatchInTransactionAfterCommit: true
     tmpDir: storage/framework/cache/phpstan

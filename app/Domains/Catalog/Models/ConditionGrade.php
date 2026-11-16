@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property string $name
+ * @property string|null $description
+ */
 final class ConditionGrade extends Model
 {
     use HasTranslations;
@@ -16,7 +20,7 @@ final class ConditionGrade extends Model
     public array $translatable = ['name', 'description'];
 
     /** @var list<string> */
-    protected $fillable = ['code', 'name', 'description', 'score_out_of_ten', 'sort_order'];
+    protected $fillable = ['code', 'name', 'description', 'score_out_of_ten', 'sort_order', 'is_active'];
 
     /**
      * @return HasMany<Product, $this>
@@ -34,6 +38,7 @@ final class ConditionGrade extends Model
         return [
             'score_out_of_ten' => 'integer',
             'sort_order' => 'integer',
+            'is_active' => 'boolean',
         ];
     }
 }

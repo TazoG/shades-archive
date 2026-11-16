@@ -14,5 +14,7 @@ final class StockAdjustmentData extends Data
         public readonly int $quantityDelta,
         public readonly StockMovementType $movementType,
         public readonly ?string $reason = null,
+        public readonly ?string $referenceType = null,
+        public readonly ?int $referenceId = null,
     ) {}
 }

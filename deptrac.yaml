@@ -3,6 +3,14 @@ deptrac:
     - ./app
 
   layers:
+    - name: UI
+      collectors:
+        - type: classLike
+          value: ^App\\(Filament|Livewire|Http)\\.*
+    - name: Providers
+      collectors:
+        - type: classLike
+          value: ^App\\Providers\\.*
     - name: DomainActions
       collectors:
         - type: classLike
@@ -23,6 +31,10 @@ deptrac:
       collectors:
         - type: classLike
           value: ^App\\Domains\\[^\\]+\\Contracts\\.*
+    - name: DomainExceptions
+      collectors:
+        - type: classLike
+          value: ^App\\Domains\\[^\\]+\\Exceptions\\.*
     - name: DomainEvents
       collectors:
         - type: classLike
@@ -61,6 +73,12 @@ deptrac:
       - DomainEnums
       - DomainContracts
       - DomainManagers
+      - DomainExceptions
+    Providers:
+      - DomainModels
+      - DomainPolicies
+      - DomainContracts
+      - Integrations
     DomainActions:
       - DomainServices
       - DomainValidators
@@ -70,6 +88,7 @@ deptrac:
       - DomainContracts
       - DomainEvents
       - DomainManagers
+      - DomainExceptions
     DomainManagers:
       - DomainContracts
       - DomainEnums
@@ -81,10 +100,12 @@ deptrac:
       - DomainEnums
       - DomainContracts
       - DomainEvents
+      - DomainExceptions
     DomainValidators:
       - DomainModels
       - DomainData
       - DomainEnums
+      - DomainExceptions
     DomainListeners:
       - DomainActions
       - DomainServices
@@ -101,21 +122,15 @@ deptrac:
       - DomainEnums
     DomainModels:
       - DomainEnums
-      - DomainData
     DomainData:
       - DomainEnums
-      - DomainModels
     DomainContracts:
       - DomainData
       - DomainEnums
       - DomainModels
     DomainEnums: []
+    DomainExceptions: []
     Integrations:
       - DomainContracts
       - DomainData
       - DomainEnums
-    Providers:
-      - DomainModels
-      - DomainPolicies
-      - DomainContracts
-      - Integrations

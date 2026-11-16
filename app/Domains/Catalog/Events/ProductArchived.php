@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Domains\Catalog\Events;
 
 use App\Domains\Catalog\Models\Product;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class ProductArchived
+final class ProductArchived implements ShouldDispatchAfterCommit
 {
     use Dispatchable;
     use SerializesModels;

@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Domains\Catalog\Models;
 
-use App\Domains\Catalog\Enums\ProductType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property string $name
+ * @property string|null $subtitle
+ * @property string|null $description
+ * @property string|null $provenance_notes
+ */
 final class Product extends Model
 {
     use HasTranslations;
@@ -26,7 +32,6 @@ final class Product extends Model
         'frame_color_id',
         'lens_color_id',
         'condition_grade_id',
-        'product_type',
         'sku',
         'slug',
         'model_code',
@@ -43,6 +48,7 @@ final class Product extends Model
         'is_one_of_one',
         'is_featured',
         'archived_at',
+        'compare_at_price_usd',
     ];
 
     /**
@@ -102,6 +108,18 @@ final class Product extends Model
     }
 
     /**
+     * @return HasOne<ProductImage, $this>
+     */
+    public function primaryImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)->ofMany([
+            'is_primary' => 'max',
+            'sort_order' => 'min',
+            'id' => 'min',
+        ]);
+    }
+
+    /**
      * @return HasMany<ProductImage, $this>
      */
     public function images(): HasMany
@@ -115,11 +133,11 @@ final class Product extends Model
     protected function casts(): array
     {
         return [
-            'product_type' => ProductType::class,
             'release_year' => 'integer',
-            'price_gel' => 'float',
-            'price_usd' => 'float',
-            'compare_at_price_gel' => 'float',
+            'price_gel' => 'decimal:2',
+            'price_usd' => 'decimal:2',
+            'compare_at_price_gel' => 'decimal:2',
+            'compare_at_price_usd' => 'decimal:2',
             'stock_quantity' => 'integer',
             'is_one_of_one' => 'boolean',
             'is_featured' => 'boolean',
