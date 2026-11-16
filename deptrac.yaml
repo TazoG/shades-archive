@@ -6,11 +6,11 @@ deptrac:
     - name: UI
       collectors:
         - type: classLike
-          value: ^App\\(Filament|Livewire|Http)\\.*
+          value: ^App\\(Filament|Livewire|Http|Providers\\Filament)\\.*
     - name: Providers
       collectors:
         - type: classLike
-          value: ^App\\Providers\\.*
+          value: ^App\\Providers\\(?!Filament\\).*
     - name: DomainActions
       collectors:
         - type: classLike
