@@ -185,11 +185,13 @@ it('protects default and in-use statuses from deletion', function (): void {
         ->toThrow(ValidationException::class);
 });
 
-it('allows guests to view available and archived products via ProductPolicy', function (): void {
+it('allows guests to view active brands, categories, and available products via policies', function (): void {
     $product = createSampleProduct();
-    $product->load('status');
+    $product->load(['status', 'brand', 'category']);
 
-    expect(Gate::forUser(null)->allows('view', $product))->toBeTrue();
+    expect(Gate::forUser(null)->allows('view', $product))->toBeTrue()
+        ->and(Gate::forUser(null)->allows('view', $product->brand))->toBeTrue()
+        ->and(Gate::forUser(null)->allows('view', $product->category))->toBeTrue();
 });
 
 it('converts decimal prices to minor units without float drift', function (): void {

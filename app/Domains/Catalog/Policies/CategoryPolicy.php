@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace App\Domains\Catalog\Policies;
 
-use App\Domains\Catalog\Models\Brand;
 use App\Domains\Catalog\Models\Category;
 use App\Domains\Users\Enums\SystemRole;
 use App\Domains\Users\Models\User;
@@ -17,9 +16,9 @@ final class CategoryPolicy
         return $user->isStaff();
     }
 
-    public function view(?User $user, Brand $brand): bool
+    public function view(?User $user, Category $category): bool
     {
-        return $user?->isStaff() === true || $brand->is_active;
+        return $user?->isStaff() === true || $category->is_active;
     }
 
     public function create(User $user): bool
