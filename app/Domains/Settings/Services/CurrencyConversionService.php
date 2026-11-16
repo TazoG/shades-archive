@@ -9,26 +9,44 @@ use App\Domains\Settings\Enums\CurrencyCode;
 final readonly class CurrencyConversionService
 {
     public function resolveAmount(
-        float $priceGel,
-        ?float $explicitUsdPrice,
+        string $priceGel,
+        ?string $explicitUsdPrice,
         CurrencyCode $targetCurrency,
-        float $usdExchangeRate,
-    ): float {
+        string $usdExchangeRate,
+    ): string {
         if ($targetCurrency === CurrencyCode::GEL) {
-            return round($priceGel, 2);
+            return number_format((float) $priceGel, 2, '.', '');
         }
 
-        if ($explicitUsdPrice !== null && $explicitUsdPrice > 0.0) {
-            return round($explicitUsdPrice, 2);
+        if ($explicitUsdPrice !== null && (float) $explicitUsdPrice > 0.0) {
+            return number_format((float) $explicitUsdPrice, 2, '.', '');
         }
 
-        $safeRate = $usdExchangeRate > 0.0 ? $usdExchangeRate : 1.0;
+        $rate = (float) $usdExchangeRate;
+        $safeRate = $rate > 0.0 ? $rate : 1.0;
 
-        return round($priceGel / $safeRate, 2);
+        return number_format((float) $priceGel / $safeRate, 2, '.', '');
     }
 
-    public function format(float $amount, CurrencyCode $currency): string
+    public function toMinorUnits(string $decimalAmount): int
     {
-        return number_format($amount, 2).' '.$currency->symbol();
+        $trimmed = trim($decimalAmount);
+
+        if (preg_match('/^-?\d+(?:\.\d{1,2})?$/', $trimmed) !== 1) {
+            throw new \InvalidArgumentException("Invalid decimal monetary amount: [{$decimalAmount}]");
+        }
+
+        $normalized = number_format((float) $trimmed, 2, '.', '');
+        [$whole, $fraction] = explode('.', $normalized);
+
+        $sign = str_starts_with($whole, '-') ? -1 : 1;
+        $absWhole = ltrim($whole, '-');
+
+        return $sign * (((int) $absWhole * 100) + (int) $fraction);
+    }
+
+    public function format(string $amount, CurrencyCode $currency): string
+    {
+        return number_format((float) $amount, 2).' '.$currency->symbol();
     }
 }
